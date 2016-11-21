@@ -27,14 +27,10 @@ namespace DotNetCore.Joust
             string dataLocation = GetDataLoction();
             SupplierRepository Rep = new SupplierRepository(dataLocation);
             //get valid carpet selection
-            Func<Carpet, bool> isRightGrade = carpet => carpet.Grade == details.DesiredCarpetGrade;
-            List<Carpet> carpetSelection = Rep.SearchInventory(isRightGrade).OrderByDescending(carpet => carpet.SquareFootage).ToList();
 
-
+            int[] potentialGrades = Rep.SearchInventory(x => true).Select(x => x.Grade).OrderBy(x => x).ToArray();
+            potentialGrades = potentialGrades.Where(grade => grade >= details.DesiredCarpetGrade).ToArray();
             List<Quote> quotes = new List<Quote>();
-            //get all quotes where one carpet can fulfill order
-
-            List<Carpet[]> validCarpetCombinations = GetPotentialCarpetPair(carpetSelection, details.SquareFootageNeeded);
             Func<Carpet[], Quote> quoteFromCarpetSelection = carpets =>
             {
                 Quote newQuote = new Quote(details);
@@ -42,12 +38,21 @@ namespace DotNetCore.Joust
                 newQuote.RollOrders = carpets.Select(x => x.InventoryId).ToArray();
                 return newQuote;
             };
-            quotes = validCarpetCombinations.Select(quoteFromCarpetSelection).ToList();
+            foreach (int grade in potentialGrades)
+            {
+                Func<Carpet, bool> isRightGrade = carpet => carpet.Grade == grade;
+                List<Carpet> carpetSelection = Rep.SearchInventory(isRightGrade).OrderByDescending(carpet => carpet.SquareFootage).ToList();
+                
+                //get all quotes where one carpet can fulfill order at this grade
+                List<Carpet[]> validCarpetCombinations = GetPotentialCarpetPair(carpetSelection, details.SquareFootageNeeded);                
+                quotes.AddRange(validCarpetCombinations.Select(quoteFromCarpetSelection).ToList());
+            }
+            
 
             Quote lowestPricedQuote = null;
             if(quotes.Any())
             {
-                lowestPricedQuote = quotes.OrderByDescending(quote => quote.Price).FirstOrDefault();
+                lowestPricedQuote = quotes.OrderBy(quote => quote.Price).FirstOrDefault();
             }
             return lowestPricedQuote;
         }
