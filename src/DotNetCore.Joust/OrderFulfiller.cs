@@ -43,46 +43,6 @@ namespace DotNetCore.Joust
                 return newQuote;
             };
             quotes = validCarpetCombinations.Select(quoteFromCarpetSelection).ToList();
-            //foreach(Carpet singleCarpet in carpetSelection.Where(x => x.SquareFootage >= details.SquareFootageNeeded))
-            //{
-            //    Quote singleSolution = new Quote(details);
-            //    singleSolution.MaterialCost = singleCarpet.UnitPrice;
-            //    singleSolution.RollOrders = new string[] { singleCarpet.InventoryId };
-            //    quotes.Add(singleSolution);
-            //}
-
-            //List<Quote> newQuotes = new List<Quote>();
-            //for(int carpetSections = 2; carpetSections <= carpetSelection.Count ; carpetSections++)
-            //{
-            //    //for each carpet less than max length
-            //    foreach (Carpet carpetLessThanNeededLength in carpetSelection.Where(x => x.SquareFootage < details.SquareFootageNeeded))
-            //    {
-            //        Quote newQuote = new Quote(details);
-            //        int lengthNeeded = details.SquareFootageNeeded - carpetLessThanNeededLength.SquareFootage;
-            //        List<string> includedSections = new List<string>(carpetSections) { carpetLessThanNeededLength.InventoryId };
-            //        List<Carpet> startUnusedCarpet = carpetSelection.Where(carpet => !includedSections.Contains(carpet.InventoryId)).ToList();
-                    
-            //        for (int nextSection = carpetSections - 1; nextSection > 0; nextSection--)
-            //        {
-            //            List<Carpet> unusedCarpet = startUnusedCarpet;
-            //            if (nextSection == 1)
-            //            {
-            //                IEnumerable<Carpet> carpetsThatCouldComplete = unusedCarpet.Where(carpet => carpet.SquareFootage >= lengthNeeded);
-            //                if (carpetsThatCouldComplete.Any())
-            //                {
-            //                    foreach (Carpet lastSection in carpetsThatCouldComplete)
-            //                    {
-
-            //                    }
-            //                }
-            //                else
-            //                {
-            //                    break;
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
 
             Quote lowestPricedQuote = null;
             if(quotes.Any())
