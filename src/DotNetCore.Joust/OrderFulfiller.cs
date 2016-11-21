@@ -9,6 +9,10 @@ namespace DotNetCore.Joust
     {
         public IQuote GetQuote(int[] input)
         {
+            if(input.Length != 4)
+            {
+                throw new InvalidDataException("Invalid data to make a quote");
+            }
             //get order details
             Order details = new Order();
             //first input is square footage needed
@@ -24,25 +28,101 @@ namespace DotNetCore.Joust
             SupplierRepository Rep = new SupplierRepository(dataLocation);
             //get valid carpet selection
             Func<Carpet, bool> isRightGrade = carpet => carpet.Grade == details.DesiredCarpetGrade;
-            List<Carpet> carpetSelection = Rep.SearchInventory(isRightGrade);
-            //make quote object
-            Quote quote = new Quote(details);
-            //running total of square footage fulfilled by sorter
-            int currentSquareFootageNeeded = details.SquareFootageNeeded;
-            //list of current products on order
-            List<string> currentProducts = new List<string>();
+            List<Carpet> carpetSelection = Rep.SearchInventory(isRightGrade).OrderByDescending(carpet => carpet.SquareFootage).ToList();
 
-            //sort carpet by preference
-            while(currentSquareFootageNeeded > 0)
+
+            List<Quote> quotes = new List<Quote>();
+            //get all quotes where one carpet can fulfill order
+
+            List<Carpet[]> validCarpetCombinations = GetPotentialCarpetPair(carpetSelection, details.SquareFootageNeeded);
+            Func<Carpet[], Quote> quoteFromCarpetSelection = carpets =>
             {
+                Quote newQuote = new Quote(details);
+                newQuote.MaterialCost = carpets.Sum(x => x.UnitPrice);
+                newQuote.RollOrders = carpets.Select(x => x.InventoryId).ToArray();
+                return newQuote;
+            };
+            quotes = validCarpetCombinations.Select(quoteFromCarpetSelection).ToList();
+            //foreach(Carpet singleCarpet in carpetSelection.Where(x => x.SquareFootage >= details.SquareFootageNeeded))
+            //{
+            //    Quote singleSolution = new Quote(details);
+            //    singleSolution.MaterialCost = singleCarpet.UnitPrice;
+            //    singleSolution.RollOrders = new string[] { singleCarpet.InventoryId };
+            //    quotes.Add(singleSolution);
+            //}
 
+            //List<Quote> newQuotes = new List<Quote>();
+            //for(int carpetSections = 2; carpetSections <= carpetSelection.Count ; carpetSections++)
+            //{
+            //    //for each carpet less than max length
+            //    foreach (Carpet carpetLessThanNeededLength in carpetSelection.Where(x => x.SquareFootage < details.SquareFootageNeeded))
+            //    {
+            //        Quote newQuote = new Quote(details);
+            //        int lengthNeeded = details.SquareFootageNeeded - carpetLessThanNeededLength.SquareFootage;
+            //        List<string> includedSections = new List<string>(carpetSections) { carpetLessThanNeededLength.InventoryId };
+            //        List<Carpet> startUnusedCarpet = carpetSelection.Where(carpet => !includedSections.Contains(carpet.InventoryId)).ToList();
+                    
+            //        for (int nextSection = carpetSections - 1; nextSection > 0; nextSection--)
+            //        {
+            //            List<Carpet> unusedCarpet = startUnusedCarpet;
+            //            if (nextSection == 1)
+            //            {
+            //                IEnumerable<Carpet> carpetsThatCouldComplete = unusedCarpet.Where(carpet => carpet.SquareFootage >= lengthNeeded);
+            //                if (carpetsThatCouldComplete.Any())
+            //                {
+            //                    foreach (Carpet lastSection in carpetsThatCouldComplete)
+            //                    {
+
+            //                    }
+            //                }
+            //                else
+            //                {
+            //                    break;
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
+
+            Quote lowestPricedQuote = null;
+            if(quotes.Any())
+            {
+                lowestPricedQuote = quotes.OrderByDescending(quote => quote.Price).FirstOrDefault();
             }
-            quote.RollOrders = currentProducts.ToArray();
-            return null;
+            return lowestPricedQuote;
         }
 
-        
-        
+        public List<Carpet[]> GetPotentialCarpetPair(List<Carpet> unusedCarpet, int minimumSize)
+        {
+            List<Carpet[]> carpetPossibilities = new List<Carpet[]>();
+            Carpet[] shallowCopyOfUnusedCarpet = new Carpet[unusedCarpet.Count];
+            unusedCarpet.CopyTo(shallowCopyOfUnusedCarpet);
+            List<Carpet> checkedCarpetCombo = shallowCopyOfUnusedCarpet.ToList();
+            foreach (Carpet carpet in unusedCarpet)
+            {
+                int newMinimumSize = minimumSize - carpet.SquareFootage;
+                checkedCarpetCombo.Remove(carpet);
+                if(newMinimumSize > 0)
+                {
+                    if (checkedCarpetCombo.Any())
+                    {
+                        foreach (Carpet[] additionalCarpets in GetPotentialCarpetPair(checkedCarpetCombo, newMinimumSize))
+                        {
+                            Carpet[] potentialFit = new Carpet[additionalCarpets.Length + 1];
+                            potentialFit[0] = carpet;
+                            additionalCarpets.CopyTo(potentialFit, 1);
+                            carpetPossibilities.Add(potentialFit);
+                        }
+                    }
+                }
+                else
+                {
+                    Carpet[] potentialFit = { carpet };
+                    carpetPossibilities.Add(potentialFit);
+                }
+            }
+            return carpetPossibilities;
+        }        
         public string GetDataLoction()
         {
             string currentLocation = System.AppContext.BaseDirectory;
