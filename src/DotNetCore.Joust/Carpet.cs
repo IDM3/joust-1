@@ -57,9 +57,9 @@ namespace DotNetCore.Joust
         }
 
         //implemented in the logn way to allow use in out parameters
-        private decimal _unitPrice;
+        private float _unitPrice;
         //Implement ICarpet.UnitPrice
-        public decimal UnitPrice 
+        public float UnitPrice 
         {
             get
             {
@@ -73,18 +73,23 @@ namespace DotNetCore.Joust
 
         //raw data we parsed values from
         private string RawData { get;set; }
-        
+
         //finds square footage of carpet roll
-        private long SquareFootage
+        private int? _squareFootage;
+        public int SquareFootage
         {
             get
             {
-                return Width * Length;
+                if(!_squareFootage.HasValue)
+                {
+                    _squareFootage = Width * Length;
+                }
+                return _squareFootage.Value;
             }
         }
 
         //finds price per square foot of carpet roll
-        private decimal PricePerSquareFoot
+        public float PricePerSquareFoot
         {
             get
             {
@@ -103,7 +108,7 @@ namespace DotNetCore.Joust
                 ParsedCorrectly = int.TryParse(subValues[1], out _grade)
                     && int.TryParse(subValues[2], out _length)
                     && int.TryParse(subValues[3], out _width)
-                    && decimal.TryParse(subValues[4], out _unitPrice);
+                    && float.TryParse(subValues[4], out _unitPrice);
             }
             else
             {
