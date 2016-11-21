@@ -5,16 +5,16 @@ namespace DotNetCore.Joust
     public class Carpet
     {
         //to be set on a failed parse set
-        public bool ParsedCorrectly {get;set;}
-        
+        public bool ParsedCorrectly { get; set; }
+
         //Inventory Id of carpet
-        public string InventoryId {get;set;}
+        public string InventoryId { get; set; }
 
         //implemented in the long way to allow use in out parameters
         private int _grade;
 
         //Grade of carpet
-        public int Grade 
+        public int Grade
         {
             get
             {
@@ -25,11 +25,11 @@ namespace DotNetCore.Joust
                 _grade = value;
             }
         }
-        
+
         //implemented in the long way to allow use in out parameters
         private int _length;
         //Carpet Length
-        public int Length 
+        public int Length
         {
             get
             {
@@ -44,7 +44,7 @@ namespace DotNetCore.Joust
         //implemented in the long way to allow use in out parameters
         private int _width;
         //Carpet Length
-        public int Width 
+        public int Width
         {
             get
             {
@@ -59,7 +59,7 @@ namespace DotNetCore.Joust
         //implemented in the logn way to allow use in out parameters
         private float _unitPrice;
         //Implement ICarpet.UnitPrice
-        public float UnitPrice 
+        public float UnitPrice
         {
             get
             {
@@ -72,7 +72,7 @@ namespace DotNetCore.Joust
         }
 
         //raw data we parsed values from
-        private string RawData { get;set; }
+        private string RawData { get; set; }
 
         //finds square footage of carpet roll
         private int? _squareFootage;
@@ -80,7 +80,7 @@ namespace DotNetCore.Joust
         {
             get
             {
-                if(!_squareFootage.HasValue)
+                if (!_squareFootage.HasValue)
                 {
                     _squareFootage = Width * Length;
                 }
@@ -97,11 +97,14 @@ namespace DotNetCore.Joust
             }
         }
 
-        public Carpet(string data)
+        private Supplier _supplier {get; set;}
+
+        public Carpet(string data, Supplier supplier)
         {
+            _supplier = supplier;
             RawData = data;
             bool isCsvValue = data.Contains(",");
-            if(isCsvValue)
+            if (isCsvValue)
             {
                 string[] subValues = data.Split(',');
                 InventoryId = subValues[0];
@@ -118,8 +121,10 @@ namespace DotNetCore.Joust
             }
         }
 
+        
+
         //default constructor
-        public Carpet() : this("Not From Data")
+        public Carpet() : this("Not From Data", null)
         {
 
         }

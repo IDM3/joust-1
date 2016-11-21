@@ -33,6 +33,8 @@ namespace DotNetCore.Joust
         // Inventory IDs of all rolls of carpet to be purchased
         public string[] RollOrders {get;set;}
 
+        public Carpet[] CarpetsInOrder { get; set; }
+
         // Order detailed needed for calculation
         public Order OrderDetails {get;set;}
 

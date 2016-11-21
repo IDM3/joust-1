@@ -50,15 +50,16 @@ namespace DotNetCore.Joust
                 bool hasRightNumberOfParts = fileNameParts.Length >= 4;
                 if(hasRightNumberOfParts)
                 {
-                    Name = fileNameParts[0];
+                    fileNameParts = fileNameParts.Reverse().ToArray();
+                    Name = string.Join(".", fileNameParts.Skip(4).Reverse());
                     //second part is received date in yyyy.mm.dd format
                     int year = 0;
                     int month = 0;
                     int day = 0;
                     bool hasDateParts =
-                        int.TryParse(fileNameParts[1], out year)
+                        int.TryParse(fileNameParts[3], out year)
                         && int.TryParse(fileNameParts[2], out month)
-                        && int.TryParse(fileNameParts[3], out day);
+                        && int.TryParse(fileNameParts[1], out day);
                     if(hasDateParts)
                     {
                         DateRecieved = new DateTime(year, month, day);
@@ -84,7 +85,7 @@ namespace DotNetCore.Joust
             string[] lines = System.IO.File.ReadAllLines(_filelocation);
             //parse each line into a carpet object
             List<Carpet> inventoryData = lines.
-                Select(rawDataLine => new Carpet(rawDataLine))
+                Select(rawDataLine => new Carpet(rawDataLine, this))
                 .ToList();
             //return the carpet inventory
             return inventoryData;
