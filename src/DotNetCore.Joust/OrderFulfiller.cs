@@ -28,7 +28,7 @@ namespace DotNetCore.Joust
             SupplierRepository Rep = new SupplierRepository(dataLocation);
             //get valid carpet selection
 
-            int[] potentialGrades = Rep.SearchInventory(x => true).Select(x => x.Grade).OrderBy(x => x).ToArray();
+            int[] potentialGrades = Rep.SearchInventory(x => true).Select(x => x.Grade).Distinct().OrderBy(x => x).ToArray();
             potentialGrades = potentialGrades.Where(grade => grade >= details.DesiredCarpetGrade).ToArray();
             List<Quote> quotes = new List<Quote>();
             Func<Carpet[], Quote> quoteFromCarpetSelection = carpets =>
@@ -36,6 +36,7 @@ namespace DotNetCore.Joust
                 Quote newQuote = new Quote(details);
                 newQuote.MaterialCost = carpets.Sum(x => x.UnitPrice);
                 newQuote.RollOrders = carpets.Select(x => x.InventoryId).ToArray();
+                newQuote.CarpetsInOrder = carpets;
                 return newQuote;
             };
             foreach (int grade in potentialGrades)
