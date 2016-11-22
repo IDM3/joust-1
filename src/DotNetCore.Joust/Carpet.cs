@@ -2,18 +2,27 @@ using System;
 
 namespace DotNetCore.Joust
 {
+    /// <summary>
+    /// Carpet Information
+    /// </summary>
     public class Carpet
     {
-        //to be set on a failed parse set
+        /// <summary>
+        /// Was the carpet parsed correctly from the CSV file
+        /// </summary>
         public bool ParsedCorrectly { get; set; }
 
-        //Inventory Id of carpet
+        /// <summary>
+        /// Inventory Id of carpet
+        /// </summary>
         public string InventoryId { get; set; }
 
         //implemented in the long way to allow use in out parameters
         private int _grade;
 
-        //Grade of carpet
+        /// <summary>
+        /// Grade of carpet should be between <see cref="MinimumGrade"/>  and <see cref="MaximumGrade"/>
+        /// </summary>
         public int Grade
         {
             get
@@ -22,13 +31,39 @@ namespace DotNetCore.Joust
             }
             set
             {
-                _grade = value;
+                //if value is less then minimum set minimum
+                if (value < MinimumGrade)
+                {
+                    _grade = MinimumGrade;
+                }
+                //if value is greater than maximum set maximum
+                else if (value > MaximumGrade)
+                {
+                    _grade = MaximumGrade;
+                }
+                //other wise keep value inputed
+                else
+                {
+                    _grade = value;
+                }
             }
         }
 
+        /// <summary>
+        /// Minimum Grade allowed
+        /// </summary>
+        public const int MinimumGrade = 1;
+
+        /// <summary>
+        /// Maximum Grade allowed
+        /// </summary>
+        public const int MaximumGrade = 9;
+
         //implemented in the long way to allow use in out parameters
         private int _length;
-        //Carpet Length
+        /// <summary>
+        /// Length of the carpet used in calculating <see cref="SquareFootage"/> 
+        /// </summary>
         public int Length
         {
             get
@@ -37,13 +72,17 @@ namespace DotNetCore.Joust
             }
             set
             {
+                //set square footage to null so it will be refigured
+                _squareFootage = null;
                 _length = value;
             }
         }
 
         //implemented in the long way to allow use in out parameters
         private int _width;
-        //Carpet Length
+        /// <summary>
+        /// Width of the carpet used in calculating <see cref="SquareFootage"/> 
+        /// </summary>
         public int Width
         {
             get
@@ -52,13 +91,18 @@ namespace DotNetCore.Joust
             }
             set
             {
+                //set square footage to null so it will be refigured
+                _squareFootage = null;
                 _width = value;
             }
         }
 
         //implemented in the logn way to allow use in out parameters
         private float _unitPrice;
-        //Implement ICarpet.UnitPrice
+
+        /// <summary>
+        /// Unit price of the carpet
+        /// </summary>
         public float UnitPrice
         {
             get
@@ -71,11 +115,17 @@ namespace DotNetCore.Joust
             }
         }
 
-        //raw data we parsed values from
-        private string RawData { get; set; }
+        /// <summary>
+        /// String data was parsed from for checking latter
+        /// </summary>
+        public string RawData { get; private set; }
 
-        //finds square footage of carpet roll
+        //cache for square footage so we aren't finding it more than once
         private int? _squareFootage;
+        /// <summary>
+        /// Square footage of carpet
+        /// </summary>
+        /// <value><see cref="Width"/> * <see cref="Length"/> </value>
         public int SquareFootage
         {
             get
@@ -88,7 +138,10 @@ namespace DotNetCore.Joust
             }
         }
 
-        //finds price per square foot of carpet roll
+        /// <summary>
+        /// Price per square foot of material
+        /// </summary>
+        /// <value><see cref="UnitPrice"/> / <see cref="SquareFootage"/>  </value>
         public float PricePerSquareFoot
         {
             get
@@ -97,25 +150,43 @@ namespace DotNetCore.Joust
             }
         }
 
-        private Supplier _supplier {get; set;}
+        /// <summary>
+        /// Supplier of  Carpet
+        /// </summary>
+        public Supplier @Supplier {get; private set;}
 
-        public Carpet(string data, Supplier supplier)
+        /// <summary>
+        /// Carpet constructor from csv file
+        /// </summary>
+        /// <param name="data">string data from line of csv file</param>
+        /// <param name="supplierOfCarpet"><see cref="Supplier"/> of Carpet for backreference</param>
+        internal Carpet(string data, Supplier supplierOfCarpet)
         {
-            _supplier = supplier;
+            @Supplier = supplierOfCarpet;
             RawData = data;
+            //is the data in csv format
             bool isCsvValue = data.Contains(",");
             if (isCsvValue)
             {
+                //split csv values
                 string[] subValues = data.Split(',');
+                //id is string value and is first so can be grabbed directly from file
                 InventoryId = subValues[0];
+                //parses basic values into value fields, if any fail Parsed Correctly is false
                 ParsedCorrectly = int.TryParse(subValues[1], out _grade)
                     && int.TryParse(subValues[2], out _length)
                     && int.TryParse(subValues[3], out _width)
                     && float.TryParse(subValues[4], out _unitPrice);
+                //Grade is a constrained value so we have an additional check ot make sure it's within constraints
+                if(Grade < MinimumGrade || Grade > MaximumGrade)
+                {
+                    //sends current grade through grade formatting logic
+                    Grade = Grade;
+                }
             }
             else
             {
-                //system generated values are alwys parsed correctly
+                //system generated values are always parsed correctly
                 ParsedCorrectly = true;
                 //do nothing with non CSV Values
             }
@@ -123,7 +194,9 @@ namespace DotNetCore.Joust
 
         
 
-        //default constructor
+        /// <summary>
+        /// For making carpet not assocaitated with csv
+        /// </summary>
         public Carpet() : this("Not From Data", null)
         {
 

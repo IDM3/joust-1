@@ -5,18 +5,27 @@ using System.Linq;
 
 namespace DotNetCore.Joust
 {
+    /// <summary>
+    /// Information about a particular carpet supplier
+    /// </summary>
     public class Supplier
     {
-        //Suppliers Name
-        public string Name {get;set;}
+        /// <summary>
+        /// Name of Supplier
+        /// </summary>
+        public string Name {get; set;}
 
-        //Date Received from Supplier
-        public DateTime DateRecieved {get;set;}
+        /// <summary>
+        /// Date carpet inventory was received
+        /// </summary>
+        public DateTime DateRecieved {get; set;}
 
         //Private variable to cache inventory data to allow lazy load of csv data
         private List<Carpet> _Inventory;
 
-        //Inventory of carpet avalible
+        /// <summary>
+        /// Inventory of avalible carpets
+        /// </summary>
         public List<Carpet> Inventory 
         {
             get
@@ -32,12 +41,20 @@ namespace DotNetCore.Joust
             }
         }
 
-        //location of file for latter refrence
-        private string _filelocation {get;set;}
+        /// <summary>
+        /// Location of CSV File
+        /// </summary>
+        public string Filelocation {get; private set;}
+
+        /// <summary>
+        /// Create supplier from a  csv file location
+        /// </summary>
+        /// <exception cref="ArgumentException">Supplier csv file not in {name}.{yyyy}.{mm}.{dd}.csv format</exception>
+        /// <param name="location">file location of csv file</param>
         public Supplier(string location)
         {
             //record file location for easy refrence latter
-            _filelocation = location;
+            Filelocation = location;
             //get file name from that info
             string fileName = Path.GetFileName(location);
             //make sure file matches required metrics
@@ -50,41 +67,54 @@ namespace DotNetCore.Joust
                 bool hasRightNumberOfParts = fileNameParts.Length >= 4;
                 if(hasRightNumberOfParts)
                 {
-                    Name = fileNameParts[0];
+                    if(!fileNameParts[0].Equals("csv", StringComparison.OrdinalIgnoreCase))
+                    {
+                        //not csv extension
+                        throw new ArgumentException(nameof(location));
+                    }
+                    fileNameParts = fileNameParts.Reverse().ToArray();
+                    Name = string.Join(".", fileNameParts.Skip(4).Reverse());
                     //second part is received date in yyyy.mm.dd format
                     int year = 0;
                     int month = 0;
                     int day = 0;
+                    //checks to make sure strings are all ints
                     bool hasDateParts =
-                        int.TryParse(fileNameParts[1], out year)
+                        int.TryParse(fileNameParts[3], out year)
                         && int.TryParse(fileNameParts[2], out month)
-                        && int.TryParse(fileNameParts[3], out day);
+                        && int.TryParse(fileNameParts[1], out day);
                     if(hasDateParts)
                     {
+                        //record date received
                         DateRecieved = new DateTime(year, month, day);
                     }
                     else
                     {
-                        throw new Exception("Invalid File Name Encountered");
+                        //invalid date parts so bad file
+                        throw new ArgumentException(nameof(location));
                     }
                 }
                 else
                 {
-                    throw new Exception("Invalid File Name Encountered");
+                    //must have at least 4 parts could have more due to . in name
+                    throw new ArgumentException(nameof(location));
                 }
             }
             
 
         }
-
-        //Gets the carpet data from the file data
+        
+        /// <summary>
+        /// Gets the carpet data from the file data
+        /// </summary>
+        /// <returns>List of <see cref="Carpet"/> from csv contents</returns>
         private List<Carpet> ParseCsvData()
         {
             //get all the lines from the file
-            string[] lines = System.IO.File.ReadAllLines(_filelocation);
+            string[] lines = System.IO.File.ReadAllLines(Filelocation);
             //parse each line into a carpet object
             List<Carpet> inventoryData = lines.
-                Select(rawDataLine => new Carpet(rawDataLine))
+                Select(rawDataLine => new Carpet(rawDataLine, this))
                 .ToList();
             //return the carpet inventory
             return inventoryData;
