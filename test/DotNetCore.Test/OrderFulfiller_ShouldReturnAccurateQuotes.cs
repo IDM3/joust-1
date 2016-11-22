@@ -16,7 +16,7 @@ namespace DotNetCore.Test
         }
 
         [Fact]
-        public void AccurageForSingleCarpet()
+        public void AccurateForSingleCarpet()
         {
             //e181f408-3f56-40d8-9149-d12a06aeea18	9	20	70	1400	$4,251.46
             //grade 9 
@@ -29,7 +29,7 @@ namespace DotNetCore.Test
         }
 
         [Fact]
-        public void AccurageForMoreCarpets()
+        public void AccurateForMoreCarpets()
         {
             //6b746c7d - 754d - 4049 - 9c5c - f2abfe73f9d3 	  9	  80  25  2000    $6,668.67
             //67b751bb - de92 - 4d4d - 8e33 - 13b535fc9bbd    9   25  75  1875    $5,388.74
