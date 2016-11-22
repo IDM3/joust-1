@@ -2,22 +2,42 @@ using System;
 
 namespace DotNetCore.Joust
 {
+    /// <summary>
+    /// User provided details for order needing quotes
+    /// </summary>
     public class Order
     {
-        //square footage required
+        /// <summary>
+        /// square footaged needing carpeted provided by user
+        /// </summary>
         public int SquareFootageNeeded {get;set;}
-        //rooms to be filled
+        
+        /// <summary>
+        /// Number of rooms needing carpeted provided by user
+        /// </summary>
         public int NumberOfRooms {get;set;}
-        //cost per hour of work
-        public int HourlyLaborCost {get;set;}
-        //desired grade of carpet
-        public int DesiredCarpetGrade {get;set;}
 
-        //static labor rate set by requirements per roll
+        /// <summary>
+        /// Cost per hour of labor provided by user
+        /// </summary>
+        public int HourlyLaborCost {get;set;}
+        
+        /// <summary>
+        /// Minimum desired carpet grade desired by user
+        /// </summary>
+        public int DesiredCarpetGrade {get;set;}
+        
+        /// <summary>
+        /// hours taken per roll provided by requirements
+        /// </summary>
         public const float HoursPerRoll = .5F;
-        //static labor rate set by requirments per room
+        /// <summary>
+        /// hours taken per room provided by requirements
+        /// </summary>
         public const float HoursPerRoom = .5F;
-        //static padding rate set by requiremnts for order
+        /// <summary>
+        /// Padding to be added to quote total as per requirements
+        /// </summary>
         public const float Padding = 1.4F;
     }
 }
