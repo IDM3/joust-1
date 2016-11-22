@@ -30,14 +30,14 @@ namespace DotNetCore.Joust
         /// <summary>
         /// hours taken per roll provided by requirements
         /// </summary>
-        public const float HoursPerRoll = .5F;
+        public const decimal HoursPerRoll = .5m;
         /// <summary>
         /// hours taken per room provided by requirements
         /// </summary>
-        public const float HoursPerRoom = .5F;
+        public const decimal HoursPerRoom = .5m;
         /// <summary>
         /// Padding to be added to quote total as per requirements
         /// </summary>
-        public const float Padding = 1.4F;
+        public const decimal Padding = 1.4m;
     }
 }

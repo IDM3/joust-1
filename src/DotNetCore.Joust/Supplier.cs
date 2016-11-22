@@ -67,12 +67,13 @@ namespace DotNetCore.Joust
                 bool hasRightNumberOfParts = fileNameParts.Length >= 4;
                 if(hasRightNumberOfParts)
                 {
-                    if(!fileNameParts[0].Equals("csv", StringComparison.CurrentCultureIgnoreCase))
+                    fileNameParts = fileNameParts.Reverse().ToArray();
+                    if (!fileNameParts[0].Equals("csv", StringComparison.CurrentCultureIgnoreCase))
                     {
                         //not csv extension
                         throw new ArgumentException(nameof(location));
                     }
-                    fileNameParts = fileNameParts.Reverse().ToArray();
+                    
                     Name = string.Join(".", fileNameParts.Skip(4).Reverse());
                     //second part is received date in yyyy.mm.dd format
                     int year = 0;

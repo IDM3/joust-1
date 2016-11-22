@@ -6,11 +6,47 @@ namespace DotNetCore.Joust
     /// Order quote
     /// </summary>
     public class Quote : IQuote
-    { 
+    {
         /// <summary>
         /// Total price including material cost, labor cost, and margin
         /// </summary>
-        public float Price 
+        /// <remarks>This was done because float was causing inaccurate measurements</remarks>
+        float IQuote.Price
+        {
+            get
+            {
+                return (float)this.Price;
+            }
+        }
+
+        /// <summary>
+        /// Cost of all carpet orders from suppliers
+        /// </summary>
+        /// <remarks>This was done because float was causing inaccurate measurements</remarks>
+        float IQuote.MaterialCost
+        {
+            get
+            {
+                return (float)this.MaterialCost;
+            }
+        }
+
+        /// <summary>
+        /// Total cost of installation labor
+        /// </summary>
+        /// <remarks>This was done because float was causing inaccurate measurements</remarks>
+        float IQuote.LaborCost
+        {
+            get
+            {
+                return (float)this.LaborCost;
+            }
+        }
+
+        /// <summary>
+        /// Total price including material cost, labor cost, and margin
+        /// </summary>
+        public decimal Price 
         {
             get
             {
@@ -21,12 +57,12 @@ namespace DotNetCore.Joust
         /// <summary>
         /// Cost of all carpet orders from suppliers
         /// </summary>
-        public float MaterialCost {get; set;}
+        public decimal MaterialCost {get; set;}
         
         /// <summary>
         /// Total cost of installation labor
         /// </summary>
-        public float LaborCost 
+        public decimal LaborCost 
         {
             get
             {
@@ -55,6 +91,8 @@ namespace DotNetCore.Joust
         /// </summary>
         public Order OrderDetails {get;set;}
 
+        
+
         /// <summary>
         /// Creates a quote
         /// </summary>
@@ -69,7 +107,7 @@ namespace DotNetCore.Joust
             }
             OrderDetails = details;
             //intialize default materials cost
-            MaterialCost = 0F;
+            MaterialCost = 0m;
         }
     }
 }

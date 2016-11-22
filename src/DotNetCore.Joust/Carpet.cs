@@ -98,12 +98,12 @@ namespace DotNetCore.Joust
         }
 
         //implemented in the logn way to allow use in out parameters
-        private float _unitPrice;
+        private decimal _unitPrice;
 
         /// <summary>
         /// Unit price of the carpet
         /// </summary>
-        public float UnitPrice
+        public decimal UnitPrice
         {
             get
             {
@@ -142,7 +142,7 @@ namespace DotNetCore.Joust
         /// Price per square foot of material
         /// </summary>
         /// <value><see cref="UnitPrice"/> / <see cref="SquareFootage"/>  </value>
-        public float PricePerSquareFoot
+        public decimal PricePerSquareFoot
         {
             get
             {
@@ -176,7 +176,7 @@ namespace DotNetCore.Joust
                 ParsedCorrectly = int.TryParse(subValues[1], out _grade)
                     && int.TryParse(subValues[2], out _length)
                     && int.TryParse(subValues[3], out _width)
-                    && float.TryParse(subValues[4], out _unitPrice);
+                    && decimal.TryParse(subValues[4], out _unitPrice);
                 //Grade is a constrained value so we have an additional check ot make sure it's within constraints
                 if(Grade < MinimumGrade || Grade > MaximumGrade)
                 {
