@@ -24,35 +24,22 @@ namespace DotNetCore.Joust
             //get directory info so we can find file info
             DirectoryInfo directory = new DirectoryInfo(directoryOfSupplierFiles);
             SupplierFile = new List<Supplier>();
-            //go through each *.csv file in directory
-            foreach(FileInfo file in directory.EnumerateFiles("*.csv"))
+            //go through each *.csv file in directory, order by descending
+            foreach(FileInfo file in directory.EnumerateFiles("*.csv").OrderByDescending(x => x.FullName))
             {
                 //create new supplier from file
                 Supplier currentSupplier = new Supplier(file.DirectoryName + Path.DirectorySeparatorChar + file.Name);
                 //function to check if suppliers have same name and are thus same supplier
-                Func<Supplier, bool> isSameSupplier = (supplier) => currentSupplier.Name == supplier.Name;
+                Func<Supplier, bool> isSameSupplier = (supplier) => currentSupplier.Name.Equals(supplier.Name, StringComparison.CurrentCultureIgnoreCase);
                 //does the respository arleady have this suppler on file
-                if(SupplierFile.Any(isSameSupplier))
+                if(!SupplierFile.Any(isSameSupplier))
                 {
-                    //if so get the old one on file
-                    Supplier oldSupplier = SupplierFile.First(isSameSupplier);
-                    //is the current supplier more recent than the one we had on file
-                    if(oldSupplier.DateRecieved < currentSupplier.DateRecieved)
-                    {
-                        //if so remove the old one
-                        SupplierFile.Remove(oldSupplier);
-                        //add the new one
-                        SupplierFile.Add(currentSupplier);
-                    }
-                    else
-                    {
-                        //do nothing the old supplier on file is the latest file copy
-                    }
+                    //if add supplier to file
+                    SupplierFile.Add(currentSupplier);
                 }
                 else
                 {
-                    //else add supplier to file
-                    SupplierFile.Add(currentSupplier);
+                    //else file is older because it falls latter on order
                 }
 
             }

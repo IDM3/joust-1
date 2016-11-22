@@ -67,7 +67,7 @@ namespace DotNetCore.Joust
                 bool hasRightNumberOfParts = fileNameParts.Length >= 4;
                 if(hasRightNumberOfParts)
                 {
-                    if(!fileNameParts[0].Equals("csv", StringComparison.OrdinalIgnoreCase))
+                    if(!fileNameParts[0].Equals("csv", StringComparison.CurrentCultureIgnoreCase))
                     {
                         //not csv extension
                         throw new ArgumentException(nameof(location));
