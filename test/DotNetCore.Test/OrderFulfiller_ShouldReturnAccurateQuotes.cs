@@ -52,5 +52,15 @@ namespace DotNetCore.Test
             Assert.Contains<string>(expectedCarpetIdArray[2], lowestQuote.RollOrders);
             Assert.Contains<string>(expectedCarpetIdArray[3], lowestQuote.RollOrders);
         }
+
+        [Fact]
+        public void TimelyResult()
+        {
+            var timer = System.Diagnostics.Stopwatch.StartNew();
+            OrderFulfiller speedTestFulfiller = new OrderFulfiller();
+            IQuote lowestQuote = speedTestFulfiller.GetQuote(10000, 100, 100, 1);
+            timer.Stop();
+            Assert.True(timer.Elapsed.TotalMinutes < 1);
+        }
     }
 }
