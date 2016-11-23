@@ -82,7 +82,7 @@ namespace DotNetCore.Joust
                 //selects carpets of the valid grade and orders them by descending square footage for latter optimization
                 List<Carpet> carpetSelection = Rep.SearchInventory(isRightGrade).OrderByDescending(carpet => carpet.SquareFootage).ToList();
                 //get all quotes where one carpet can fulfill order at this grade
-                List<Carpet[]> validCarpetCombinations = GetPotentialCarpetPair(carpetSelection, details.SquareFootageNeeded);     
+                List<Carpet[]> validCarpetCombinations = GetPotentialUniqueCarpetPair(carpetSelection, details.SquareFootageNeeded);     
                 //add qutoes found to the quote list           
                 quotes.AddRange(validCarpetCombinations.Select(quoteFromCarpetSelection).ToList());
             }
@@ -105,7 +105,7 @@ namespace DotNetCore.Joust
         /// <param name="unusedCarpet">Valid list of <see cref="Carpet"/> to be used for combination </param>
         /// <param name="minimumSize">Squate footage needed to be a valid <see cref="IQuote"/></param>
         /// <returns>List of <see cref="Carpet[]"/> combinations made from <paramref name="unusedCarpet"/></returns>
-        public List<Carpet[]> GetPotentialCarpetPair(List<Carpet> unusedCarpet, int minimumSize)
+        public List<Carpet[]> GetPotentialUniqueCarpetPair(List<Carpet> unusedCarpet, int minimumSize)
         {
             //list of new carpet possibilities
             List<Carpet[]> carpetPossibilities = new List<Carpet[]>();
@@ -122,6 +122,62 @@ namespace DotNetCore.Joust
                 checkedCarpetCombo.Remove(carpet);
                 //do we need more carpet to fulfil the order
                 if(newMinimumSize > 0)
+                {
+                    //are there any possible carpets that can fulfile the order
+                    if (checkedCarpetCombo.Any())
+                    {
+                        //for each combination that will make this carpet fulfill the minimum square footage requirement
+                        foreach (Carpet[] additionalCarpets in GetPotentialUniqueCarpetPair(checkedCarpetCombo, newMinimumSize))
+                        {
+                            //create the array to hold the carpets
+                            Carpet[] potentialFit = new Carpet[additionalCarpets.Length + 1];
+                            //the first index will be this carpet because that makes sense
+                            potentialFit[0] = carpet;
+                            //take the carpets that complete this quote and put them into the array of carpets after this one
+                            additionalCarpets.CopyTo(potentialFit, 1);
+                            //add this combination of the possible combinations 
+                            carpetPossibilities.Add(potentialFit);
+                        }
+                    }
+                    else
+                    {
+                        //no carpets fulfil order so this branch will fall out and not provide a potential carpet combination
+                    }
+                }
+                else
+                {
+                    //this carpet by itself fulfills the requiremetns of a valid combination
+                    Carpet[] potentialFit = { carpet };
+                    //add it to the potential list
+                    carpetPossibilities.Add(potentialFit);
+                }
+            }
+            //return all the carpet possibilities
+            return carpetPossibilities;
+        }
+
+
+        /// <summary>
+        /// Gets all the potential <see cref="Carpet"/> combinations (assuming each row is an ifinite inventory) that add up to the minimum size
+        /// </summary>
+        /// <param name="unusedCarpet">Valid list of <see cref="Carpet"/> to be used for combination </param>
+        /// <param name="minimumSize">Squate footage needed to be a valid <see cref="IQuote"/></param>
+        /// <returns>List of <see cref="Carpet[]"/> combinations made from <paramref name="unusedCarpet"/></returns>
+        public List<Carpet[]> GetPotentialCarpetPair(List<Carpet> unusedCarpet, int minimumSize)
+        {
+            //list of new carpet possibilities
+            List<Carpet[]> carpetPossibilities = new List<Carpet[]>();
+            //need a copy of carpets to eliminate unused carpets from so we don't have the same carpet in one order
+            Carpet[] shallowCopyOfUnusedCarpet = new Carpet[unusedCarpet.Count];
+            unusedCarpet.CopyTo(shallowCopyOfUnusedCarpet);
+            List<Carpet> checkedCarpetCombo = shallowCopyOfUnusedCarpet.ToList();
+            //cycle through all the carpets and find all combinations that will add up to the minimum size needed
+            foreach (Carpet carpet in unusedCarpet)
+            {
+                //find the new size of carpet needed to complete order
+                int newMinimumSize = minimumSize - carpet.SquareFootage;                
+                //do we need more carpet to fulfil the order
+                if (newMinimumSize > 0)
                 {
                     //are there any possible carpets that can fulfile the order
                     if (checkedCarpetCombo.Any())
@@ -151,11 +207,13 @@ namespace DotNetCore.Joust
                     //add it to the potential list
                     carpetPossibilities.Add(potentialFit);
                 }
+                //remove this carpet from selection of valid carpets
+                checkedCarpetCombo.Remove(carpet);
             }
             //return all the carpet possibilities
             return carpetPossibilities;
-        }      
-        
+        }
+
         /// <summary>
         /// Gets the location of the CSV files that hold the supplier info
         /// This one is pretty murky, but we were told by requirements data should be in the top directory of the project so that is how I search for it

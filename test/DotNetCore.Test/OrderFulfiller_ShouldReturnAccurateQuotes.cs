@@ -54,13 +54,14 @@ namespace DotNetCore.Test
         }
 
         [Fact]
-        public void TimelyResult()
+        public void ReturnsNullIfNoneAvalibleInATimelyManner()
         {
             var timer = System.Diagnostics.Stopwatch.StartNew();
             OrderFulfiller speedTestFulfiller = new OrderFulfiller();
-            IQuote lowestQuote = speedTestFulfiller.GetQuote(10000, 100, 100, 1);
+            IQuote lowestQuote = speedTestFulfiller.GetQuote(int.MaxValue, 100, 100, 1);
             timer.Stop();
             Assert.True(timer.Elapsed.TotalMinutes < 1);
+            Assert.Null(lowestQuote);
         }
     }
 }
