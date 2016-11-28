@@ -2,17 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 using DotNetCore.Joust;
 using Xunit;
 
 namespace DotNetCore.Test
 {
-    public class OrderFulfiller_ShouldReturnAccurateQuotes
+    public class Joust1_ShouldReturnAccurateQuotes
     {
-        private readonly OrderFulfiller _orderFulfiller;
-        public OrderFulfiller_ShouldReturnAccurateQuotes()
+        private readonly IJoust _joust;
+        public Joust1_ShouldReturnAccurateQuotes()
         {
-            _orderFulfiller = new OrderFulfiller();
+            Type joustInterfaceType = typeof(IJoust);
+            Type joust = Assembly.Load(new AssemblyName("DotNetCore.Joust")).GetTypes()
+                .FirstOrDefault(type => joustInterfaceType.IsAssignableFrom(type) && type != joustInterfaceType);
+            _joust = (IJoust)Activator.CreateInstance(joust);
         }
 
         [Fact]
@@ -23,7 +27,7 @@ namespace DotNetCore.Test
             float expectedPriceResult = 4251.46f * 1.4f;
             string[] expectedCarpetIdArray = { "e181f408-3f56-40d8-9149-d12a06aeea18" };
 
-            IQuote lowestQuote = _orderFulfiller.GetQuote(1000, 0, 0, 9);
+            IQuote lowestQuote = _joust.GetQuote(new int[] { 1000, 0, 0, 9 });
             Assert.Equal(expectedPriceResult, lowestQuote.Price);
             Assert.Equal(expectedCarpetIdArray, lowestQuote.RollOrders);
         }
@@ -44,7 +48,7 @@ namespace DotNetCore.Test
                     "de4d199e-ce50-47e9-993f-ffb47d071db2",
                     "e181f408-3f56-40d8-9149-d12a06aeea18"
                 };
-            IQuote lowestQuote = _orderFulfiller.GetQuote(7000, 0, 0, 9);
+            IQuote lowestQuote = _joust.GetQuote(new int[] { 7000, 0, 0, 9 });
             Assert.Equal(expectedPriceResult, lowestQuote.Price);
             Assert.Equal(expectedCarpetIdArray.Length, lowestQuote.RollOrders.Length);
             Assert.Contains<string>(expectedCarpetIdArray[0], lowestQuote.RollOrders);
@@ -56,9 +60,12 @@ namespace DotNetCore.Test
         [Fact]
         public void ReturnsNullIfNoneAvalibleInATimelyManner()
         {
+            Type joustInterfaceType = typeof(IJoust);
+            Type joust = Assembly.Load(new AssemblyName("DotNetCore.Joust")).GetTypes()
+                .FirstOrDefault(type => joustInterfaceType.IsAssignableFrom(type) && type != joustInterfaceType);
             var timer = System.Diagnostics.Stopwatch.StartNew();
-            OrderFulfiller speedTestFulfiller = new OrderFulfiller();
-            IQuote lowestQuote = speedTestFulfiller.GetQuote(int.MaxValue, 100, 100, 1);
+            IJoust speedTest = (IJoust)Activator.CreateInstance(joust);
+            IQuote lowestQuote = speedTest.GetQuote(new int[] { int.MaxValue, 100, 100, 1 });
             timer.Stop();
             Assert.True(timer.Elapsed.TotalMinutes < 1);
             Assert.Null(lowestQuote);
