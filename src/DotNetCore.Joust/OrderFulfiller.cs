@@ -87,8 +87,30 @@ namespace DotNetCore.Joust
                 Func<Carpet, bool> isRightGrade = carpet => carpet.Grade == grade;
                 //selects carpets of the valid grade and orders them by descending square footage for latter optimization
                 List<Carpet> carpetSelection = Rep.SearchInventory(isRightGrade).OrderByDescending(carpet => carpet.SquareFootage).ToList();
+                //patch for potential negative labor
+                Func<Carpet, bool> carpetIsFreeOrGivesYouMoney = carpet => carpet.UnitPrice <= (-1 * hourlyLaborRate * Order.HoursPerRoll);
+                List<Carpet> profitCarpets = carpetSelection.Where(carpetIsFreeOrGivesYouMoney).ToList();
+                //remove free carpets
+                carpetSelection.RemoveAll(carpet => profitCarpets.Contains(carpet));
                 //get all quotes where one carpet can fulfill order at this grade
-                List<Carpet[]> validCarpetCombinations = GetPotentialUniqueCarpetPair(carpetSelection, details.SquareFootageNeeded);     
+                List<Carpet[]> validCarpetCombinations = GetPotentialUniqueCarpetPair(
+                    carpetSelection, 
+                    (details.SquareFootageNeeded - profitCarpets.Sum(carpet => carpet.SquareFootage)));
+                //if we have a negative labor value we need to add our profit carpets back in
+                if (profitCarpets.Any())
+                {
+                    //add profit carpets to all selections            
+                    for (int index = 0; index < validCarpetCombinations.Count; index++)
+                    {
+                        validCarpetCombinations[index] = validCarpetCombinations[index].Union(profitCarpets).ToArray();
+                    }
+                    //can an combo be made of the profit carpets?
+                    if (profitCarpets.Sum(carpet => carpet.SquareFootage) >= details.SquareFootageNeeded)
+                    {
+                        //if so we should add it as a valid combinations
+                        validCarpetCombinations.Add(profitCarpets.ToArray());
+                    }
+                }
                 //add qutoes found to the quote list           
                 quotes.AddRange(validCarpetCombinations.Select(quoteFromCarpetSelection).ToList());
             }
