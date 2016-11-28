@@ -30,7 +30,9 @@ namespace DotNetCore.Joust
                 //create new supplier from file
                 Supplier currentSupplier = new Supplier(file.DirectoryName + Path.DirectorySeparatorChar + file.Name);
                 //function to check if suppliers have same name and are thus same supplier
-                Func<Supplier, bool> isSameSupplier = (supplier) => currentSupplier.Name.Equals(supplier.Name, StringComparison.CurrentCultureIgnoreCase);
+                Func<Supplier, bool> isSameSupplier = (supplier) => currentSupplier.Name.Equals(
+                    supplier.Name, 
+                    StringComparison.CurrentCultureIgnoreCase);
                 //does the respository arleady have this suppler on file
                 if(!SupplierFile.Any(isSameSupplier))
                 {

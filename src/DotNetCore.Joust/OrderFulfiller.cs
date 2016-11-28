@@ -10,11 +10,14 @@ namespace DotNetCore.Joust
         /// <summary>
         /// Get quote from inputed order details
         /// </summary>
-        /// <param name="input">array that contains Square Footage Needed, number of rooms, hourly labor rate, and desired grade inclusively between <see cref="Carpet.MinimumGrade"/> and <see cref="Carpet.MaximumGrade"/></param>
+        /// <param name="input">array that contains Square Footage Needed, number of rooms, hourly labor rate, 
+        /// and desired grade inclusively between <see cref="Carpet.MinimumGrade"/> and <see cref="Carpet.MaximumGrade"/></param>
         /// <exception cref="ArgumentNullException"><paramref name="input"/> is null </exception>
         /// <exception cref="ArgumentException"><paramref name="input"/> contains more or less than 4 ints </exception>
-        /// <exception cref="ArgumentOutOfRangeException">if it receives an input for <paramref name="input"/>[3] that is not inclusively between <see cref="Carpet.MinimumGrade"/> and <see cref="Carpet.MaximumGrade"/> </exception> 
-        /// <returns>Lowest <see cref="IQuote.Price"/> <see cref="IQuote"/> found by order fulfilling algorithm, if the order can not be fulfilled it returns null</returns>
+        /// <exception cref="ArgumentOutOfRangeException">if it receives an input for <paramref name="input"/>[3] 
+        /// that is not inclusively between <see cref="Carpet.MinimumGrade"/> and <see cref="Carpet.MaximumGrade"/> </exception> 
+        /// <returns>Lowest <see cref="IQuote.Price"/> <see cref="IQuote"/> found by order fulfilling algorithm, 
+        /// if the order can not be fulfilled it returns null</returns>
         public IQuote GetQuote(int[] input)
         {
             if(input == null)
@@ -36,9 +39,12 @@ namespace DotNetCore.Joust
         /// <param name="squareFootageNeeded">Minimum square footage that should be present in a quote</param>
         /// <param name="numberOfRooms">Number of rooms needed by quote used for labor cost</param>
         /// <param name="hourlyLaborRate">Cost per hour of Labor</param>
-        /// <param name="desiredGrade">Minimum grade of carpet needed inclusively between <see cref="Carpet.MinimumGrade"/> and <see cref="Carpet.MaximumGrade"/></param>
-        /// <exception cref="ArgumentOutOfRangeException">if it receives an input for <paramref name="desiredGrade"/> that is not inclusively between <see cref="Carpet.MinimumGrade"/> and <see cref="Carpet.MaximumGrade"/> </exception> 
-        /// <returns>Lowest <see cref="IQuote.Price"/> <see cref="IQuote"/> found by order fulfilling algorithm, if the order can not be fulfilled it returns null</returns>
+        /// <param name="desiredGrade">Minimum grade of carpet needed inclusively between <see cref="Carpet.MinimumGrade"/> 
+        /// and <see cref="Carpet.MaximumGrade"/></param>
+        /// <exception cref="ArgumentOutOfRangeException">if it receives an input for <paramref name="desiredGrade"/> 
+        /// that is not inclusively between <see cref="Carpet.MinimumGrade"/> and <see cref="Carpet.MaximumGrade"/> </exception> 
+        /// <returns>Lowest <see cref="IQuote.Price"/> <see cref="IQuote"/> found by order fulfilling algorithm, 
+        /// if the order can not be fulfilled it returns null</returns>
         public IQuote GetQuote(int squareFootageNeeded, int numberOfRooms, int hourlyLaborRate, int desiredGrade)
         {
             //validate desired grade is within acceptable limits
@@ -158,7 +164,8 @@ namespace DotNetCore.Joust
 
         /// <summary>
         /// Gets the location of the CSV files that hold the supplier info
-        /// This one is pretty murky, but we were told by requirements data should be in the top directory of the project so that is how I search for it
+        /// This one is pretty murky, but we were told by requirements data should be in the top directory of the project 
+        /// so that is how I search for it
         /// </summary>
         /// <returns>the directory that holds the csv files or null if none are found</returns>
         public string GetDataLoction()
