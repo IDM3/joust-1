@@ -9,6 +9,48 @@ namespace DotNetCore.Joust
         public static void Main(string[] args)
         {
             OrderFulfiller orderFiller = new OrderFulfiller();
+            if (args.Any() && args.Length == 4)
+            {
+                int squareFootageNeeded = 0;
+                int roomsBeingCarpeted = 0;
+                int hourlyLabor = 0;
+                int grade = 0;
+                if(int.TryParse(args[0], out squareFootageNeeded) 
+                    && int.TryParse(args[1], out roomsBeingCarpeted)
+                    && int.TryParse(args[2], out hourlyLabor)
+                    && int.TryParse(args[3], out grade))
+                {
+                    IQuote rawQuote = orderFiller.GetQuote(squareFootageNeeded, roomsBeingCarpeted, hourlyLabor, grade);
+                    Quote quote = (Quote)rawQuote;
+                    Console.Clear();
+                    string filePath = AppContext.BaseDirectory + "\\OrderHistory.txt";
+                    if (quote != null)
+                    {
+                        string[] suppliers = quote.CarpetsInOrder.Select(x => x.Supplier.Name).Distinct().ToArray();
+                        Console.WriteLine("The Cheapest Quote is {0}", quote.Price.ToString("$0.00"));
+                        Console.WriteLine("Order the following");
+                        foreach (string supplier in suppliers)
+                        {
+                            var carpetForSupplier =
+                                string.Join(", ", quote.CarpetsInOrder
+                                    .Where(x => x.Supplier.Name == supplier).Select(x => x.InventoryId));
+                            Console.WriteLine("{0}: {1}", supplier, carpetForSupplier);
+                        }
+                        File.AppendAllText(filePath,
+                            $"[{squareFootageNeeded}, {roomsBeingCarpeted}, {hourlyLabor}, {grade}] {quote.Price.ToString("$0.00")} ({string.Join(", ", quote.RollOrders)}){Environment.NewLine}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Current carpet inventory can not support this order.");
+                        File.AppendAllText(filePath,
+                            $"[{squareFootageNeeded}, {roomsBeingCarpeted}, {hourlyLabor}, {grade}] Unable to fill order.{Environment.NewLine}");
+                    }
+                    Console.WriteLine("Press any key to continue.");
+                    Console.ReadKey(false);
+                }
+
+            }
+            
             bool takingOrders = true;
             do
             {
