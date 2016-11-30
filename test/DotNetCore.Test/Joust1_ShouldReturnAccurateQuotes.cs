@@ -24,10 +24,13 @@ namespace DotNetCore.Test
         {
             //e181f408-3f56-40d8-9149-d12a06aeea18	9	20	70	1400	$4,251.46
             //grade 9 
-            float expectedPriceResult = 4251.46f * 1.4f;
+            //1 room, 1 carpet, at 100 per hour of labor should be 100m labor
+            float expectedPriceResult = (float)((4251.46m + 100m ) * 1.4m);
             string[] expectedCarpetIdArray = { "e181f408-3f56-40d8-9149-d12a06aeea18" };
 
-            IQuote lowestQuote = _joust.GetQuote(new int[] { 1000, 0, 0, 9 });
+            IQuote lowestQuote = _joust.GetQuote(new int[] { 1000, 1, 100, 9 });
+            Assert.Equal(4251.46f, lowestQuote.MaterialCost);
+            Assert.Equal(100f, lowestQuote.LaborCost);
             Assert.Equal(expectedPriceResult, lowestQuote.Price);
             Assert.Equal(expectedCarpetIdArray, lowestQuote.RollOrders);
         }
