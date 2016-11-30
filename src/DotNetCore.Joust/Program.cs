@@ -60,7 +60,7 @@ namespace DotNetCore.Joust
                     Console.WriteLine("Please provide the order specifications.");
                     int squareFootageNeeded = GetIntInput("square footage needed", 0);
                     int roomsBeingCarpeted = GetIntInput("rooms to be carpeted", 0);
-                    int hourlyLabor = GetIntInput("hourly labor cost", 0);
+                    int hourlyLabor = GetIntInput("hourly labor cost");
                     int grade = GetIntInput("quality grade", 1, 9);
                     IQuote rawQuote = orderFiller.GetQuote(squareFootageNeeded, roomsBeingCarpeted, hourlyLabor, grade);
                     Quote quote = (Quote)rawQuote;
