@@ -13,10 +13,7 @@ namespace DotNetCore.Test
         private readonly IJoust _joust;
         public Joust1_ShouldReturnAccurateQuotes()
         {
-            Type joustInterfaceType = typeof(IJoust);
-            Type joust = Assembly.Load(new AssemblyName("DotNetCore.Joust")).GetTypes()
-                .FirstOrDefault(type => joustInterfaceType.IsAssignableFrom(type) && type != joustInterfaceType);
-            _joust = (IJoust)Activator.CreateInstance(joust);
+            //TO-DO: set _joust equal to an instance of your IJoust implementation
         }
 
         [Fact]
@@ -63,11 +60,9 @@ namespace DotNetCore.Test
         [Fact]
         public void ReturnsNullIfNoneAvalibleInATimelyManner()
         {
-            Type joustInterfaceType = typeof(IJoust);
-            Type joust = Assembly.Load(new AssemblyName("DotNetCore.Joust")).GetTypes()
-                .FirstOrDefault(type => joustInterfaceType.IsAssignableFrom(type) && type != joustInterfaceType);
             var timer = System.Diagnostics.Stopwatch.StartNew();
-            IJoust speedTest = (IJoust)Activator.CreateInstance(joust);
+            IJoust speedTest;
+            //TO-DO: set speedTest equal to an instance of your IJoust implementation
             IQuote lowestQuote = speedTest.GetQuote(new int[] { int.MaxValue, 100, 100, 1 });
             timer.Stop();
             Assert.True(timer.Elapsed.TotalMinutes < 1);
