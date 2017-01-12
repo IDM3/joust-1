@@ -133,7 +133,7 @@ namespace DotNetCore.Joust
         /// <param name="unusedCarpet">Valid list of <see cref="Carpet"/> to be used for combination </param>
         /// <param name="minimumSize">Squate footage needed to be a valid <see cref="IQuote"/></param>
         /// <returns>List of <see cref="Carpet[]"/> combinations made from <paramref name="unusedCarpet"/></returns>
-        public List<Carpet[]> GetPotentialUniqueCarpetPair(List<Carpet> unusedCarpet, int minimumSize)
+        protected List<Carpet[]> GetPotentialUniqueCarpetPair(List<Carpet> unusedCarpet, int minimumSize)
         {
             //list of new carpet possibilities
             List<Carpet[]> carpetPossibilities = new List<Carpet[]>();
@@ -170,6 +170,7 @@ namespace DotNetCore.Joust
                     else
                     {
                         //no carpets fulfil order so this branch will fall out and not provide a potential carpet combination
+                        break; //fixes optimization issue
                     }
                 }
                 else
@@ -190,7 +191,7 @@ namespace DotNetCore.Joust
         /// so that is how I search for it
         /// </summary>
         /// <returns>the directory that holds the csv files or null if none are found</returns>
-        public string GetDataLoction()
+        protected string GetDataLoction()
         {
             //get the location we are running from
             string currentLocation = System.AppContext.BaseDirectory;
