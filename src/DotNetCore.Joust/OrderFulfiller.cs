@@ -65,6 +65,24 @@ namespace DotNetCore.Joust
             //get supplier details
             string dataLocation = GetDataLoction();
             SupplierRepository Rep = new SupplierRepository(dataLocation);
+            //Verify inventory is good (addresses issue of not checking inputted data)
+            List<Carpet> badInventory = Rep.SearchInventory(x => !x.ParsedCorrectly);
+            bool hasBadInventory = badInventory.Any();
+            if(hasBadInventory)
+            {
+                List<string> badSuppliers = badInventory.Select(x => x.Supplier.Name).Distinct().ToList();
+                string error = "Data provided by supplier";
+                if (badSuppliers.Count == 1)
+                {
+                    error += $" {badSuppliers.First()} ";
+                }
+                else
+                {
+                    error += $"s {string.Join(", ", badSuppliers)} ";
+                }
+                error += "has bad inventory data, please correct data and try again.";
+                throw new InvalidOperationException(error);
+            }
             //get all valid grades present in inventory
             int[] potentialGrades = Rep.SearchInventory(x => true).Select(x => x.Grade).Distinct().OrderBy(x => x).ToArray();
             //limit grades avalible to desired grade or higher

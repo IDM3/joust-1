@@ -180,6 +180,7 @@ namespace DotNetCore.Joust
                 //Grade is a constrained value so we have an additional check ot make sure it's within constraints
                 if(Grade < MinimumGrade || Grade > MaximumGrade)
                 {
+                    ParsedCorrectly = false;
                     //sends current grade through grade formatting logic
                     Grade = Grade;
                 }
